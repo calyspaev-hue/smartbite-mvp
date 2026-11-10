@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="SmartBite AI turns ingredients you already have into realistic meal ideas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,560;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>SmartBite AI — cook what you have</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app"><header class="topbar"><div class="brand"><span class="brand-mark">✦</span> SmartBite AI</div><nav><button class="lang-toggle" id="lang-btn" aria-label="Switch language">KZ</button><button class="active" data-nav="home">Kitchen</button><button data-nav="saved">Saved</button></nav></header>
+<main class="main"><section id="home-view"><div class="hero"><div><div class="eyebrow" id="eyebrow">Your fridge, made useful</div><h1 id="hero-h1">Cook what you have. <em>Waste less.</em></h1><p id="hero-p">Point us at your ingredients and get a few realistic dinner ideas in seconds — no endless scrolling, no extra shopping trip.</p><button class="cta" id="start-btn">Find my dinner</button></div><div class="hero-art"><div class="phone"><small id="phone-title">Tonight's plan</small><h3 id="phone-h3">Use what is<br>waiting.</h3><div class="scan">🥬</div><div class="mini-line"></div><div class="mini-line short"></div><div class="mini-line"></div></div><div class="art-copy" id="art-copy">Built for the random Tuesday fridge.</div></div></div><div id="flow" class="hidden"></div></section><section id="saved-view" class="hidden"><div class="panel"><h2 id="saved-title">Your saved ideas</h2><p class="sub" id="saved-sub">Recipes you marked for later will show up here.</p><div id="saved-list" class="recipe-grid"></div></div></section></main><div id="toast" class="toast" role="status"></div></div><script src="recipes.js"></script><script src="app.js"></script>
+</body></html>

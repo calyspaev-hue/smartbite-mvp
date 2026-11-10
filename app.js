@@ -122,8 +122,10 @@ function confirmScreen() { return `${progress()}<div class="panel"><h2>${t('s2Ti
 
 function constraintScreen() { return `${progress()}<div class="panel"><h2>${t('s3Title')}</h2><p class="sub">${t('s3Sub')}</p><div class="form-grid"><div class="field"><label for="time">${t('timeLabel')}</label><select id="time"><option value="15">${t('t15')}</option><option value="30" selected>${t('t30')}</option><option value="60">${t('t60')}</option></select></div><div class="field"><label for="servings">${t('servingsLabel')}</label><select id="servings"><option value="1">${t('p1')}</option><option value="2" selected>${t('p2')}</option><option value="4">${t('p4')}</option></select></div><div class="field"><label for="diet">${t('dietLabel')}</label><select id="diet"><option value="anything">${t('dAny')}</option><option value="vegetarian">${t('dVeg')}</option><option value="dairy-free">${t('dDairy')}</option></select></div></div><div class="actions"><button class="cta secondary" id="back-confirm">${t('backBtn')}</button><button class="cta" id="show-results">${t('showResults')}</button></div></div>`; }
 
+function normalize(word) { return window.ALIASES[word] || word; }
 function score(recipe) {
-  const hits = state.ingredients.filter((i) => recipe.uses.some((u) => i.includes(u) || u.includes(i))).length;
+  const have = state.ingredients.map(normalize);
+  const hits = have.filter((i) => recipe.uses.some((u) => i.includes(u) || u.includes(i))).length;
   return hits * 25 + (recipe.time <= state.time ? 20 : 0);
 }
 function recipeCard(recipe) {
@@ -138,7 +140,7 @@ function resultsScreen() {
   if (!matched.length) {
     return `${progress()}<div class="panel"><h2>${t('s4Title')}</h2>${errorBox(t('errNoMatch'))}<div class="actions"><button class="cta secondary" id="restart">${t('restart')}</button></div></div>`;
   }
-  return `${progress()}<div class="results-head"><div><h2>${t('s4Title')}</h2><p>${t('s4Sub')}</p></div><button class="cta secondary" id="restart">${t('restart')}</button></div><div class="recipe-grid">${matched.slice(0, 4).map(recipeCard).join('')}</div>`;
+  return `${progress()}<div class="results-head"><div><h2>${t('s4Title')}</h2><p>${t('s4Sub')}</p></div><button class="cta secondary" id="restart">${t('restart')}</button></div><div class="recipe-grid">${matched.slice(0, 6).map(recipeCard).join('')}</div>`;
 }
 function detailScreen() {
   const r = window.RECIPES.find((x) => x.id === state.selected);
@@ -199,8 +201,8 @@ async function runRecognition(photo) {
   } catch { /* network or function unavailable */ }
   if (status) status.classList.add('hidden');
   if (ingredients && ingredients.length) {
-    state.ingredients = ingredients;
-    toast(t('scanDone')(ingredients.length));
+    state.ingredients = ingredients.map(normalize).filter((w) => w && w.length > 1);
+    toast(t('scanDone')(state.ingredients.length));
   } else if (ingredients) {
     state.ingredients = [];
     state.error = t('errNoMatch');
@@ -246,8 +248,9 @@ function bind() {
       toast(t('demoScan'));
     } else {
       const text = $('#manual-input')?.value || '';
-      const words = text.split(/[,\n]+/).map((x) => x.trim().toLowerCase()).filter(Boolean);
-      const unknown = words.find((w) => !window.KNOWN.includes(w) && w.length > 2);
+      const words = text.split(/[,\n]+/).map((x) => normalize(x.trim().toLowerCase())).filter(Boolean);
+      const known = new Set([...window.KNOWN, ...Object.keys(window.ALIASES)]);
+      const unknown = words.find((w) => !known.has(w) && w.length > 2);
       if (!words.length) { state.error = t('errNoInput'); render(); return; }
       if (unknown) { state.error = t('errUnknownWord')(unknown); render(); return; }
       state.error = null;

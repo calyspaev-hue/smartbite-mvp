@@ -62,9 +62,9 @@ window.RECIPES = [
 ];
 // Known ingredient words for validation (EN + KZ) — broadened to match the recipe set
 window.KNOWN = ['tomato','tomatoes','cream','pasta','garlic','rice','egg','eggs','carrot','onion','chickpea','chickpeas','lemon','cucumber','tortilla','cheese','pepper','coconut','spinach','bread','herb','herbs','potato','potatoes','chicken','beef','milk','butter','cabbage','pumpkin','flour','beet','noodle','noodles','zucchini','mushroom','mushrooms','oil','salt','sugar','soy',
-'қызанақ','жұмыртқа','күріш','пияз','сарымсақ','сүт','ірімшік','қияр','ет','тауық','картоп','сәбіз','қызылша','орамжапырақ','асқабақ','ұн','кеспе','бақлажан','көкөніс'];
+'қызанақ','жұмыртқа','күріш','пияз','сарымсақ','сүт','ірімшік','қияр','ет','тауық','картоп','сәбіз','қызылша','орамжапырақ','асқабақ','ұн','кеспе','бақлажан','көкөніс','нан','бұрыш','лимон','ноқат','шпинат','кокос','май'];
 // Map Kazakh + common AI-returned ingredient words to recipe `uses` keys
 window.ALIASES = {
-  'қызанақ':'tomato','қызанақтар':'tomato','жұмыртқа':'egg','күріш':'rice','пияз':'onion','сарымсақ':'garlic','сүт':'milk','ірімшік':'cheese','қияр':'cucumber','ет':'beef','тауық':'chicken','картоп':'potato','сәбіз':'carrot','қызылша':'beet','орамжапырақ':'cabbage','асқабақ':'pumpkin','ұн':'flour','кеспе':'noodle',
+  'қызанақ':'tomato','қызанақтар':'tomato','жұмыртқа':'egg','күріш':'rice','пияз':'onion','сарымсақ':'garlic','сүт':'milk','ірімшік':'cheese','қияр':'cucumber','ет':'beef','тауық':'chicken','картоп':'potato','сәбіз':'carrot','қызылша':'beet','орамжапырақ':'cabbage','асқабақ':'pumpkin','ұн':'flour','кеспе':'noodle','нан':'bread','бұрыш':'pepper','лимон':'lemon','ноқат':'chickpea','шпинат':'spinach','кокос':'coconut','май':'butter',
   'tomatoes':'tomato','eggs':'egg','potatoes':'potato','chickpeas':'chickpea','herbs':'herb','noodles':'noodle','bell pepper':'pepper','chicken breast':'chicken','scallion':'onion','spring onion':'onion'
 };

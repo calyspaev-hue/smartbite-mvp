@@ -123,9 +123,14 @@ function confirmScreen() { return `${progress()}<div class="panel"><h2>${t('s2Ti
 function constraintScreen() { return `${progress()}<div class="panel"><h2>${t('s3Title')}</h2><p class="sub">${t('s3Sub')}</p><div class="form-grid"><div class="field"><label for="time">${t('timeLabel')}</label><select id="time"><option value="15">${t('t15')}</option><option value="30" selected>${t('t30')}</option><option value="60">${t('t60')}</option></select></div><div class="field"><label for="servings">${t('servingsLabel')}</label><select id="servings"><option value="1">${t('p1')}</option><option value="2" selected>${t('p2')}</option><option value="4">${t('p4')}</option></select></div><div class="field"><label for="diet">${t('dietLabel')}</label><select id="diet"><option value="anything">${t('dAny')}</option><option value="vegetarian">${t('dVeg')}</option><option value="dairy-free">${t('dDairy')}</option></select></div></div><div class="actions"><button class="cta secondary" id="back-confirm">${t('backBtn')}</button><button class="cta" id="show-results">${t('showResults')}</button></div></div>`; }
 
 function normalize(word) { return window.ALIASES[word] || word; }
+// fuzzy: singularize + substring match either way, so AI plurals/qualifiers hit
+function looseMatch(a, b) {
+  const s = (x) => x.replace(/e?s$/, '');
+  return a.includes(b) || b.includes(a) || s(a).includes(s(b)) || s(b).includes(s(a));
+}
 function score(recipe) {
   const have = state.ingredients.map(normalize);
-  const hits = have.filter((i) => recipe.uses.some((u) => i.includes(u) || u.includes(i))).length;
+  const hits = have.filter((i) => recipe.uses.some((u) => looseMatch(i, u))).length;
   return hits * 25 + (recipe.time <= state.time ? 20 : 0);
 }
 const ICONS = {
@@ -145,12 +150,11 @@ function recipeCard(recipe) {
 }
 function resultsScreen() {
   const list = window.RECIPES.map((r) => ({ ...r, score: score(r) })).sort((a, b) => b.score - a.score);
-  const matched = list.filter((r) => r.score >= 50);
-  state.lastResults = matched;
+  const matched = list.filter((r) => r.score >= 50);  state.lastResults = matched;
   if (!matched.length) {
     return `${progress()}<div class="panel"><h2>${t('s4Title')}</h2>${errorBox(t('errNoMatch'))}<div class="actions"><button class="cta secondary" id="restart">${t('restart')}</button></div></div>`;
   }
-  return `${progress()}<div class="results-head"><div><h2>${t('s4Title')}</h2><p>${t('s4Sub')}</p></div><button class="cta secondary" id="restart">${t('restart')}</button></div><div class="recipe-grid">${matched.slice(0, 6).map(recipeCard).join('')}</div>`;
+  return `${progress()}<div class="results-head"><div><h2>${t('s4Title')}</h2><p>${t('s4Sub')}</p></div><button class="cta secondary" id="restart">${t('restart')}</button></div><div class="recipe-grid">${matched.slice(0, 9).map(recipeCard).join('')}</div>`;
 }
 function detailScreen() {
   const r = window.RECIPES.find((x) => x.id === state.selected);

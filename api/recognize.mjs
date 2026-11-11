@@ -17,28 +17,34 @@ export async function handler(event) {
   if (!imageBase64 || !mimeType) {
     return { statusCode: 400, body: JSON.stringify({ error: 'imageBase64 and mimeType are required' }) };
   }
+  const models = ['gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest'];
   const prompt =
     'Look at this fridge or food photo. List the food ingredients you can identify. ' +
     'Reply ONLY with a JSON array of lowercase English ingredient words, e.g. ["tomato","egg","rice"]. ' +
     'Maximum 10 items. If you cannot identify any food, reply [].';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`;
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{
-        parts: [
-          { text: prompt },
-          { inline_data: { mime_type: mimeType, data: imageBase64 } }
-        ]
-      }],
-      generationConfig: { temperature: 0.1, maxOutputTokens: 200 }
-    })
-  });
-  if (!resp.ok) {
-    return { statusCode: 502, body: JSON.stringify({ error: `Gemini API error ${resp.status}` }) };
+  let data = null;
+  for (const model of models) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inline_data: { mime_type: mimeType, data: imageBase64 } }
+          ]
+        }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 500 }
+      })
+    });
+    if (!resp.ok) continue; // try next model
+    data = await resp.json();
+    if (data?.candidates?.[0]?.content?.parts?.[0]?.text) break;
   }
-  const data = await resp.json();
+  if (!data) {
+    return { statusCode: 502, body: JSON.stringify({ error: 'Gemini API unavailable' }) };
+  }
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
   let ingredients;
   try { ingredients = JSON.parse(text.trim().replace(/^```(json)?|```$/g, '')); } catch {
@@ -50,3 +56,4 @@ export async function handler(event) {
     body: JSON.stringify({ ingredients: ingredients.map((x) => String(x).toLowerCase().slice(0, 40)) })
   };
 }
+// Allow longer ingredient lists and plural forms from the model; scored client-side.
